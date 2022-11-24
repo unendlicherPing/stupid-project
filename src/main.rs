@@ -1,26 +1,31 @@
 //! This will be a very stupid project.
 
-use std::env::Args;
-
+#[derive(Debug)]
 enum StupidError {
-    ToMuchArgs
+    ToLessArgs,
+    ToMuchArgs,
 }
 
 type StupidResult<T> = Result<T, StupidError>;
 
+#[derive(Debug)]
 struct StupidArgs {
     msg: String,
 }
 
 impl StupidArgs {
-    fn parse_args(args: Args) -> StupidResult<Self> {
+    fn parse_args(args: &mut dyn Iterator<Item = String>) -> StupidResult<Self> {
         let args: Vec<String> = args.collect();
-        
-        if args.len() >= 1 {
+
+        if args.len() < 2 {
+            return Err(StupidError::ToLessArgs)
+        }
+
+        if args.len() > 2 {
             return Err(StupidError::ToMuchArgs)
         }
 
-        let arg = args.get(0).unwrap();
+        let arg = args.get(1).unwrap();
 
         Ok(Self { msg: arg.to_owned() })
     }
@@ -29,9 +34,16 @@ impl StupidArgs {
 }
 
 fn main() {
-    let args: StupidArgs = match StupidArgs::parse_args(std::env::args()) {
+    let args: StupidArgs = match StupidArgs::parse_args(&mut std::env::args()) {
         Ok(args) => args,
-        Err(_) => panic!("To much arguments btw."),
+        Err(StupidError::ToLessArgs) => { 
+            eprintln!("To less arguments btw.");
+            return;
+        }
+        Err(StupidError::ToMuchArgs) => {
+            eprintln!("To much arguments btw.");
+            return;
+        }
     };
 
     println!("Your message was: {}", args.msg())
