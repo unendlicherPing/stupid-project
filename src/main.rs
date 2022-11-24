@@ -48,3 +48,42 @@ fn main() {
 
     println!("Your message was: {}", args.msg())
 }
+
+#[cfg(test)]
+mod test {
+    use crate::{StupidArgs, StupidResult, StupidError};
+
+    #[test]
+    fn test_parser_result() {
+        let test_data = [String::from("foo"), String::from("bar")];
+        let test_data = &mut test_data.iter().map(|s| s.to_owned());
+
+        let args: StupidResult<StupidArgs> = StupidArgs::parse_args(test_data);
+
+        assert_eq!(args.unwrap().msg(), "bar")
+    }
+
+    #[test]
+    fn test_parser_to_low() {
+        let test_data = [String::from("foo")];
+        let test_data = &mut test_data.iter().map(|s| s.to_owned());
+
+        let args: StupidResult<StupidArgs> = StupidArgs::parse_args(test_data);
+
+        let Err(StupidError::ToLessArgs) = args else {
+            panic!()
+        };
+    }
+
+    #[test]
+    fn test_parser_to_large() {
+        let test_data = [String::from("foo"), String::from("bar"), String::from("foobar")];
+        let test_data = &mut test_data.iter().map(|s| s.to_owned());
+
+        let args: StupidResult<StupidArgs> = StupidArgs::parse_args(test_data);
+
+        let Err(StupidError::ToMuchArgs) = args else {
+            panic!()
+        };
+    }
+}
