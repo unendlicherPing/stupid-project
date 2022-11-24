@@ -1,5 +1,39 @@
+//! # Parser
+//!
+//! `parser` parses an `Iterator` of `String` into the `StupidArgs` struct.
+
 use crate::prelude::*;
 
+/// # StupidArgs
+///
+/// This struct parses the first element of an Iterator of Strings and parses it into a message.
+///
+/// The intention behind all this is that it will take the commandline arguments and it will
+/// return a struct with the first argument, the message, or if the argument size is 0 or more
+/// than 1 it will return an error.
+///
+/// # Returns
+///
+/// ## StrupidArgs
+/// If the iterator got exactly 2 arguments which means one commandline argument.
+///
+/// ## `Error::ToLessArgs`
+/// If the iterator got less than 2 arguments which means no commandline argument.
+///
+/// ## `Error::ToMuchArgs`
+/// If the iterator got more than 2 arguments which means more than 1 commandline argument.
+///
+/// # Example
+///
+/// ```
+/// let argument = std::env::args();
+/// # let argument = [String::from("bar"), String::from("foo"), String::from("foobar")];
+/// # let argument = &mut test_data.iter().map(|s| s.to_owned());
+///
+/// let to_stupid_args = StrupidArgs::parse(&mut arguments).unwrap();
+///
+/// assert_eq!(to_stupid_args.msg(), "foo");
+/// ```
 #[derive(Debug)]
 pub struct StupidArgs {
     msg: String,
